@@ -1,0 +1,54 @@
+---
+ 
+     
+- hosts: kibana
+  become: true
+  tasks:
+  - name: Gather the package facts
+    ansible.builtin.package_facts:
+      manager: auto
+  
+  - name: Download kibana
+    ansible.builtin.command: wget https://mirror.yandex.ru/mirrors/elastic/8/pool/main/k/kibana/kibana-8.9.2-amd64.deb
+    when: "'kibana' not in ansible_facts.packages"
+
+  - name: Install kibana
+    ansible.builtin.command: dpkg -i kibana-8.9.2-amd64.deb
+    when:
+      - ansible_os_family == "Debian"
+      - "'kibana' not in ansible_facts.packages"
+  
+  - name: Updating the config file to allow outside access
+    lineinfile:
+      destfile: /etc/kibana/kibana.yml
+      regexp: 'server.host:'
+      line: 'server.host: 0.0.0.0'
+      
+  - name: Defining server port
+    lineinfile:
+      destfile: /etc/kibana/kibana.yml
+      regexp: 'server.port:'
+      line: 'server.port: 5601'
+  
+  - name: Defining Elasticsearch URL
+    lineinfile:
+      destfile: /etc/kibana/kibana.yml
+      regexp: 'elasticsearch.hosts:'
+      line: 'elasticsearch.hosts: "http://192.168.10.86:9200"'
+      
+   
+  - name: kibana enable
+    systemd:
+      name: kibana.service
+      enabled: yes
+  
+ 
+    
+  - name: kibana restart
+    systemd:
+      name: kibana.service
+      state: restarted
+      
+  
+
+...

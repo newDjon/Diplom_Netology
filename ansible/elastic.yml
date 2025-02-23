@@ -1,0 +1,74 @@
+---
+
+- hosts: elastic
+  become: true
+  tasks:
+  - name: Gather the package facts
+    ansible.builtin.package_facts:
+      manager: auto
+  
+  - name: Download elastic
+    ansible.builtin.command: wget https://mirror.yandex.ru/mirrors/elastic/8/pool/main/e/elasticsearch/elasticsearch-8.9.2-amd64.deb
+    when: "'elasticsearch' not in ansible_facts.packages"
+
+  - name: Install elastic
+    ansible.builtin.command: dpkg -i elasticsearch-8.9.2-amd64.deb
+    when: 
+      - ansible_os_family == "Debian"
+      - "'elasticsearch' not in ansible_facts.packages"
+    
+  - name: elastic enable
+    systemd:
+      name: elasticsearch.service
+      enabled: yes
+      
+  - name: Updating the config file to allow outside access
+    lineinfile:
+      destfile: /etc/elasticsearch/elasticsearch.yml
+      regexp: 'network.host:'
+      line: 'network.host: 0.0.0.0'
+      
+  - name: Updating the port in config file 
+    lineinfile:
+      destfile: /etc/elasticsearch/elasticsearch.yml
+      regexp: 'http.port:'
+      line: 'http.port: 9200'
+      
+  - name: Disable security 
+    lineinfile:
+      destfile: /etc/elasticsearch/elasticsearch.yml
+      regexp: 'xpack.security.enabled:'
+      line: 'xpack.security.enabled: false'
+    
+  - name: elastic restart
+    systemd:
+      name: elasticsearch.service
+      state: restarted
+      
+  - name: Download logstash
+    ansible.builtin.command: wget https://mirror.yandex.ru/mirrors/elastic/8/pool/main/l/logstash/logstash-8.9.2-amd64.deb
+    when: "'logstash' not in ansible_facts.packages"
+     
+  - name: Install logstash
+    ansible.builtin.command: dpkg -i logstash-8.9.2-amd64.deb
+    when: 
+      - ansible_os_family == "Debian"
+      - "'logstash' not in ansible_facts.packages"
+     
+  - name: logstash enable
+    systemd:
+      name: logstash.service
+      enabled: yes
+  
+  - name: "Copy config"
+    ansible.builtin.copy:
+      src: "./logstash_nginx.conf"
+      dest: "/etc/logstash/conf.d/"
+  
+  - name: logstash restart
+    systemd:
+      name: logstash.service
+      state: restarted
+   
+      
+...

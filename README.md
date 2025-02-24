@@ -80,12 +80,41 @@ Cоздайте ВМ, разверните на ней Elasticsearch. Устан
 При помощи terraform создаю следующую инфраструтктуру: 2 виртуальные машины для web сервера Nginx, по одной для Kibana, Elstic, Zabbix и для Bastion сервера. Также создаю балансировщик HTTP, группу безопасности.
 В группе безопасности разрешаем доступ для Bastion сервера по 22 TCP порту, для Zabbix по 80 и 10051, для Kibana 5601.
 
-![Задание №1.1](https://github.com/newDjon/Network-Protected/blob/main/suricata.png)
+![Задание №1.3](https://github.com/newDjon/Diplom_Netology/blob/main/security.png)
 
 2. Сайт
 При помоши Ansible с Bastion сервера на 2 виртуальных машинах устанавливаем web сервер nginx.
 
-![Задание №2.1](https://github.com/newDjon/Network-Protected/blob/main/suricata.png)
+![Задание №2.1](https://github.com/newDjon/Diplom_Netology/blob/main/nginx.png)
+
+3. Мониторинг
+
+При помоши Ansible с Bastion сервера на 1 виртуальной машине устанавливаю zabbix-server, на остальных zabbix-agent.
+Создаю дашборды для каждой ВМ.
+
+![Задание №3.1](https://github.com/newDjon/Diplom_Netology/blob/main/zabbix_elastic.png)
+
+![Задание №3.2](https://github.com/newDjon/Diplom_Netology/blob/main/zabbix_kibana.png)
+
+![Задание №3.3](https://github.com/newDjon/Diplom_Netology/blob/main/zabbix_nginx1.png)
+
+![Задание №3.4](https://github.com/newDjon/Diplom_Netology/blob/main/zabbix_nginx2.png)
+
+![Задание №3.3](https://github.com/newDjon/Diplom_Netology/blob/main/zabbix_server.png)
+
+4. Логи
+
+При помоши Ansible с Bastion сервера устанавливаю Elastic и logsatsh, Kibana и Filebeat.
+
+![Задание №4.1](https://github.com/newDjon/Diplom_Netology/blob/main/elk.png)
+
+5. Резервное копирование.
+
+При помощи terraform создаю snapshot дисков всех ВМ.
+
+![Задание №5.1](https://github.com/newDjon/Diplom_Netology/blob/main/backup_disk.png)
+
+
 
 
 
